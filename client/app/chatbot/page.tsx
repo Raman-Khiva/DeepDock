@@ -494,106 +494,147 @@ const Example = () => {
         [text, status]
     );
 
-    if (status == "ready") {
-        console.log("READY : ", messages);
+    if (status == 'ready') {
+        console.log('messages', messages)
     }
 
-
     return (
-        <div className="relative flex size-full flex-col divide-y overflow-hidden">
-            <div>
-                {messages.map((message) => (
-                    <div key={message.id}>
-                        {message.parts.map((part, index) => (
-                            <div key={index}>
-                                {part.type === "text" ? part.text : ""}
-                            </div>
+        <div className="relative flex justify-center items-center flex-col divide-y overflow-hidden">
+            <div className="max-w-[62rem] px-4">
+                <Conversation>
+                    <ConversationContent>
+                        {messages.map((message: any) => (
+                            <Message
+                                from={message.role === "user" ? "user" : "assistant"}
+                                key={message.id}
+                            >
+                                <div className="flex flex-col gap-2">
+                                    {message.parts?.map((part: any, index: number) => {
+                                        if (part.type === "text") {
+                                            // Check for thinking block
+                                            const thinkMatch = part.text.match(/<think>([\s\S]*?)(?:<\/think>|$)/);
+                                            const cleanupText = (text: string) => text.replace(/<think>[\s\S]*?<\/think>/g, "").replace(/<think>[\s\S]*$/, "").trim();
+
+                                            if (thinkMatch) {
+                                                const reasoningContent = thinkMatch[1];
+                                                const mainContent = cleanupText(part.text);
+
+                                                return (
+                                                    <div key={index} className="flex flex-col gap-2">
+                                                        {reasoningContent && (
+                                                            <Reasoning>
+                                                                <ReasoningTrigger />
+                                                                <ReasoningContent>
+                                                                    {reasoningContent}
+                                                                </ReasoningContent>
+                                                            </Reasoning>
+                                                        )}
+                                                        {mainContent && (
+                                                            <MessageContent>
+                                                                <MessageResponse>{mainContent}</MessageResponse>
+                                                            </MessageContent>
+                                                        )}
+                                                    </div>
+                                                );
+                                            }
+
+                                            return (
+                                                <MessageContent key={index}>
+                                                    <MessageResponse>{part.text}</MessageResponse>
+                                                </MessageContent>
+                                            );
+                                        }
+                                        return null;
+                                    })}
+                                </div>
+                            </Message>
                         ))}
+                    </ConversationContent>
+                    <ConversationScrollButton />
+                </Conversation>
+                <div className="grid shrink-0 gap-4 pt-4">
+                    <Suggestions className="px-4">
+                        {suggestions.map((suggestion) => (
+                            <SuggestionItem
+                                key={suggestion}
+                                onClick={handleSuggestionClick}
+                                suggestion={suggestion}
+                            />
+                        ))}
+                    </Suggestions>
+                    <div className="w-full px-4 pb-4">
+                        <PromptInput globalDrop multiple onSubmit={handleSubmit}>
+                            <PromptInputHeader>
+                                <PromptInputAttachmentsDisplay />
+                            </PromptInputHeader>
+                            <PromptInputBody>
+                                <PromptInputTextarea onChange={handleTextChange} value={text} />
+                            </PromptInputBody>
+                            <PromptInputFooter>
+                                <PromptInputTools>
+                                    <PromptInputActionMenu>
+                                        <PromptInputActionMenuTrigger />
+                                        <PromptInputActionMenuContent>
+                                            <PromptInputActionAddAttachments />
+                                        </PromptInputActionMenuContent>
+                                    </PromptInputActionMenu>
+                                    <SpeechInput
+                                        className="shrink-0 bg-blue-600"
+                                        onTranscriptionChange={handleTranscriptionChange}
+                                        size="icon-sm"
+                                        variant="ghost"
+                                    />
+                                    <PromptInputButton
+                                        onClick={toggleWebSearch}
+                                        variant={useWebSearch ? "default" : "ghost"}
+                                    >
+                                        <GlobeIcon size={16} />
+                                        <span>Search</span>
+                                    </PromptInputButton>
+                                    <ModelSelector
+                                        onOpenChange={setModelSelectorOpen}
+                                        open={modelSelectorOpen}
+                                    >
+                                        <ModelSelectorTrigger asChild>
+                                            <PromptInputButton>
+                                                {selectedModelData?.chefSlug && (
+                                                    <ModelSelectorLogo
+                                                        provider={selectedModelData.chefSlug}
+                                                    />
+                                                )}
+                                                {selectedModelData?.name && (
+                                                    <ModelSelectorName>
+                                                        {selectedModelData.name}
+                                                    </ModelSelectorName>
+                                                )}
+                                            </PromptInputButton>
+                                        </ModelSelectorTrigger>
+                                        <ModelSelectorContent>
+                                            <ModelSelectorInput placeholder="Search models..." />
+                                            <ModelSelectorList>
+                                                <ModelSelectorEmpty>No models found.</ModelSelectorEmpty>
+                                                {chefs.map((chef) => (
+                                                    <ModelSelectorGroup heading={chef} key={chef}>
+                                                        {models
+                                                            .filter((m) => m.chef === chef)
+                                                            .map((m) => (
+                                                                <ModelItem
+                                                                    isSelected={model === m.id}
+                                                                    key={m.id}
+                                                                    m={m}
+                                                                    onSelect={handleModelSelect}
+                                                                />
+                                                            ))}
+                                                    </ModelSelectorGroup>
+                                                ))}
+                                            </ModelSelectorList>
+                                        </ModelSelectorContent>
+                                    </ModelSelector>
+                                </PromptInputTools>
+                                <PromptInputSubmit disabled={isSubmitDisabled} status={status} />
+                            </PromptInputFooter>
+                        </PromptInput>
                     </div>
-                ))}
-            </div>
-            <div className="grid shrink-0 gap-4 pt-4">
-                <Suggestions className="px-4">
-                    {suggestions.map((suggestion) => (
-                        <SuggestionItem
-                            key={suggestion}
-                            onClick={handleSuggestionClick}
-                            suggestion={suggestion}
-                        />
-                    ))}
-                </Suggestions>
-                <div className="w-full px-4 pb-4">
-                    <PromptInput globalDrop multiple onSubmit={handleSubmit}>
-                        <PromptInputHeader>
-                            <PromptInputAttachmentsDisplay />
-                        </PromptInputHeader>
-                        <PromptInputBody>
-                            <PromptInputTextarea onChange={handleTextChange} value={text} />
-                        </PromptInputBody>
-                        <PromptInputFooter>
-                            <PromptInputTools>
-                                <PromptInputActionMenu>
-                                    <PromptInputActionMenuTrigger />
-                                    <PromptInputActionMenuContent>
-                                        <PromptInputActionAddAttachments />
-                                    </PromptInputActionMenuContent>
-                                </PromptInputActionMenu>
-                                <SpeechInput
-                                    className="shrink-0"
-                                    onTranscriptionChange={handleTranscriptionChange}
-                                    size="icon-sm"
-                                    variant="ghost"
-                                />
-                                <PromptInputButton
-                                    onClick={toggleWebSearch}
-                                    variant={useWebSearch ? "default" : "ghost"}
-                                >
-                                    <GlobeIcon size={16} />
-                                    <span>Search</span>
-                                </PromptInputButton>
-                                <ModelSelector
-                                    onOpenChange={setModelSelectorOpen}
-                                    open={modelSelectorOpen}
-                                >
-                                    <ModelSelectorTrigger asChild>
-                                        <PromptInputButton>
-                                            {selectedModelData?.chefSlug && (
-                                                <ModelSelectorLogo
-                                                    provider={selectedModelData.chefSlug}
-                                                />
-                                            )}
-                                            {selectedModelData?.name && (
-                                                <ModelSelectorName>
-                                                    {selectedModelData.name}
-                                                </ModelSelectorName>
-                                            )}
-                                        </PromptInputButton>
-                                    </ModelSelectorTrigger>
-                                    <ModelSelectorContent>
-                                        <ModelSelectorInput placeholder="Search models..." />
-                                        <ModelSelectorList>
-                                            <ModelSelectorEmpty>No models found.</ModelSelectorEmpty>
-                                            {chefs.map((chef) => (
-                                                <ModelSelectorGroup heading={chef} key={chef}>
-                                                    {models
-                                                        .filter((m) => m.chef === chef)
-                                                        .map((m) => (
-                                                            <ModelItem
-                                                                isSelected={model === m.id}
-                                                                key={m.id}
-                                                                m={m}
-                                                                onSelect={handleModelSelect}
-                                                            />
-                                                        ))}
-                                                </ModelSelectorGroup>
-                                            ))}
-                                        </ModelSelectorList>
-                                    </ModelSelectorContent>
-                                </ModelSelector>
-                            </PromptInputTools>
-                            <PromptInputSubmit disabled={isSubmitDisabled} status={status} />
-                        </PromptInputFooter>
-                    </PromptInput>
                 </div>
             </div>
         </div>

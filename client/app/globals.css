@@ -133,6 +133,44 @@
 }
 
 
+.prose h1 {
+  font-size: 2.4rem;
+  font-weight: 700;
+}
+
+.prose h2 {
+  font-size: 4rem;
+  font-weight: 700;
+}
+
+.prose h3 {
+  font-size: 1.8rem;
+  font-weight: 700;
+}
+
+.prose h4 {
+  font-size: 2rem;
+  font-weight: 700;
+}
+
+
+
+.prose p {
+  font-size: 1.14rem;
+  font-weight: 500;
+}
+
+.prose code {
+  font-size: 1.2rem;
+  font-weight: 300;
+}
+
+.prose span {
+
+  font-weight: 700;
+}
+
+
 
 .nav {
   height: var(--navbar-height);
