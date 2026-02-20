@@ -436,7 +436,7 @@ const ModelItem = ({
     );
 };
 
-const Example = () => {
+const Chatbot = () => {
     const { messages, sendMessage, status } = useChat({
         transport: new DefaultChatTransport({
             api: '/api/chat',
@@ -641,4 +641,4 @@ const Example = () => {
     );
 };
 
-export default Example;
+export default Chatbot;
