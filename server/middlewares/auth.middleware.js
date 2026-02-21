@@ -1,3 +1,6 @@
+import 'dotenv/config';
 import { requireAuth } from "@clerk/express";
 
-export const clerkAuth = requireAuth();
+const clerkAuth = requireAuth();
+
+export default clerkAuth;
