@@ -18,3 +18,18 @@ model User {
   id String @id @default(cuid())
   clerkId String @unique
 }
+
+model Project{
+  id String @id @default(cuid())
+  userId String 
+  name String
+  description String @default("")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  files String[]
+}
+
+model File{
+  id String @id @default(cuid())
+  content Json
+}

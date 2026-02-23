@@ -3,7 +3,8 @@ import { ClerkProvider } from '@clerk/nextjs'
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import useSyncUser from '@/hooks/useSyncUser';
-
+import { Provider } from 'react-redux'
+import { store } from './store';
 
 const SyncUserWrapper = ({ children }) => {
   useSyncUser();
@@ -27,16 +28,20 @@ const metadata = {
 
 export default function RootLayout({ children }) {
   return (
+
     <ClerkProvider>
-      <html lang="en">
-        <body
-          className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-        >
-          <SyncUserWrapper>
-            {children}
-          </SyncUserWrapper>
-        </body>
-      </html>
+      <Provider store={store} >
+
+        <html lang="en">
+          <body
+            className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+          >
+            <SyncUserWrapper>
+              {children}
+            </SyncUserWrapper>
+          </body>
+        </html>
+      </Provider>
     </ClerkProvider>
   );
 }
