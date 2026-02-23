@@ -6,6 +6,7 @@
 // }
 
 import { AppSidebar } from "@/components/app-sidebar"
+import NewProject from "@/components/NewProject"
 import AnimatedFolder from "@/components/ThreeDFolder"
 import {
     Breadcrumb,
@@ -55,6 +56,8 @@ export default function Page() {
                         </Breadcrumb>
                     </div>
                 </header>
+                <div className="flex flex-col">
+                </div>
                 <div className="w-full min-h-screen grid grid-cols-4 px-10 pt-10">
                     {Array.from({ length: 10 }).map((_, i) => (
                         <AnimatedFolder key={i} title="Deepdock" projects={projects} />
